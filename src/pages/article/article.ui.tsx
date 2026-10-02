@@ -10,6 +10,7 @@ import { ErrorMessages } from '~shared/ui/error-messages/error-messages.ui';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
 import type { ArticleHideToggleActionData } from '~pages/admin/actions/article-hide-toggle.action';
 import { adminPaths } from '~pages/admin/admin.paths';
+import { TipForm } from '~pages/tip/tip-form.ui';
 import type { CommentCreateActionData } from './actions/comment-create.action';
 import type { ArticlePageLoaderData } from './article.loader';
 import { articlePaths } from './article.paths';
@@ -81,8 +82,31 @@ function ArticleContent({ article }: ArticleContentProps) {
         <div className="article-actions">
           <ArticleActionsBlock article={article} />
         </div>
+
+        <ArticleTip article={article} />
       </div>
     </>
+  );
+}
+
+type ArticleTipProps = {
+  article: SingleArticleResponse['article'];
+};
+
+function ArticleTip({ article }: ArticleTipProps) {
+  const { userData } = useLoaderData<ArticlePageLoaderData>();
+  const { slug, author } = article;
+
+  if (userData?.user?.username === author.username) {
+    return null;
+  }
+
+  return (
+    <div className="row">
+      <div className="col-xs-12 col-md-8 offset-md-2">
+        <TipForm author={author.username} article={slug} isGuest={!userData} />
+      </div>
+    </div>
   );
 }
 

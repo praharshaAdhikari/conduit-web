@@ -82,6 +82,17 @@ export const adminRoute = {
       },
     },
     {
+      path: adminPaths.tips,
+      lazy: async () => {
+        const [{ AdminTipsPage: Component }, { adminTipsLoader: loader }] = await Promise.all([
+          import('~pages/admin/tips/admin-tips.ui'),
+          import('~pages/admin/tips/admin-tips.loader'),
+        ]);
+
+        return { Component, loader };
+      },
+    },
+    {
       path: adminPaths.refund,
       middleware: [requireRoleMiddleware('admin')],
       lazy: async () => {

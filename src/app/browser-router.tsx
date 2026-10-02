@@ -12,6 +12,7 @@ import { page404Route } from '~pages/page-404/page-404.route';
 import { profileRoute } from '~pages/profile/profile.route';
 import { registerRoute } from '~pages/register/register.route';
 import { settingsRoute } from '~pages/settings/settings.route';
+import { tipCreateRoute, tipRoute, tipsRoute } from '~pages/tip/tip.route';
 import { Layout } from './app-layout.ui';
 import { appLoader } from './app.loader';
 
@@ -35,6 +36,9 @@ export const browserRouter = () =>
         membershipRoute,
         membershipSuccessRoute,
         membershipCancelledRoute,
+        tipCreateRoute,
+        tipsRoute,
+        tipRoute,
       ],
       hydrateFallbackElement: <Spinner />,
     },

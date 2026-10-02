@@ -17,6 +17,7 @@ tags:
   - name: Membership
   - name: Profile
   - name: Tags
+  - name: Tips
   - name: User and Authentication
 servers:
   - url: https://api.realworld.io/api
@@ -1363,6 +1364,253 @@ paths:
                 $ref: '#/components/schemas/GenericErrorModel'
       security:
         - Token: []
+  /tips:
+    post:
+      tags:
+        - Tips
+      summary: Start a tip. Login is optional; a guest gives an email address
+      operationId: CreateTip
+      parameters:
+        - name: X-Guest-Token
+          in: header
+          description: A guest token from an earlier verified tip; skips the emailed code for the same address
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTipRequest'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartedTipResponse'
+        '404':
+          description: No such author or article
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '429':
+          description: Too many codes were sent to this address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+  /tips/{reference}:
+    get:
+      tags:
+        - Tips
+      summary: A tip, by its reference
+      operationId: GetTip
+      parameters:
+        - name: reference
+          in: path
+          description: The reference of the tip
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipResponse'
+        '404':
+          description: No such tip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+  /tips/{reference}/verify:
+    post:
+      tags:
+        - Tips
+      summary: Confirm a guest's email address with the emailed code
+      operationId: VerifyTip
+      parameters:
+        - name: reference
+          in: path
+          description: The reference of the tip
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyTipRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiedTipResponse'
+        '404':
+          description: No such tip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+  /tips/{reference}/resend:
+    post:
+      tags:
+        - Tips
+      summary: Email a new code
+      operationId: ResendTipCode
+      parameters:
+        - name: reference
+          in: path
+          description: The reference of the tip
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipResponse'
+        '404':
+          description: No such tip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '429':
+          description: Too many codes were sent to this address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+  /user/tips:
+    get:
+      tags:
+        - Tips
+      summary: The current user's tips, newest first
+      operationId: GetUserTips
+      parameters:
+        - name: direction
+          in: query
+          description: Which tips to list, "received" (the default) or "sent"
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/tips:
+    get:
+      tags:
+        - Admin
+      summary: List all tips. Moderators only
+      operationId: GetAdminTips
+      parameters:
+        - name: status
+          in: query
+          description: Only tips with this status
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTipsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
 components:
   schemas:
     LoginUser:
@@ -1986,6 +2234,182 @@ components:
       properties:
         payment:
           $ref: '#/components/schemas/AdminPayment'
+    TipStatus:
+      type: string
+      enum:
+        - pending_verification
+        - pending_payment
+        - paid
+        - expired
+        - refunded
+    Tip:
+      required:
+        - amountCents
+        - author
+        - createdAt
+        - currency
+        - reference
+        - status
+      type: object
+      properties:
+        reference:
+          type: string
+        status:
+          $ref: '#/components/schemas/TipStatus'
+        amountCents:
+          type: integer
+        currency:
+          type: string
+        author:
+          type: string
+        article:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          nullable: true
+    AdminTip:
+      required:
+        - amountCents
+        - author
+        - createdAt
+        - currency
+        - reference
+        - status
+        - tipperEmail
+      type: object
+      properties:
+        reference:
+          type: string
+        status:
+          $ref: '#/components/schemas/TipStatus'
+        amountCents:
+          type: integer
+        currency:
+          type: string
+        author:
+          type: string
+        article:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          nullable: true
+        tipperEmail:
+          type: string
+        tipperUsername:
+          type: string
+          nullable: true
+    NewTip:
+      required:
+        - amountCents
+        - author
+      type: object
+      properties:
+        author:
+          type: string
+        article:
+          type: string
+        amountCents:
+          type: integer
+        name:
+          type: string
+        message:
+          type: string
+        email:
+          type: string
+    NewTipRequest:
+      required:
+        - tip
+      type: object
+      properties:
+        tip:
+          $ref: '#/components/schemas/NewTip'
+    StartedTipResponse:
+      required:
+        - checkoutUrl
+        - tip
+      type: object
+      properties:
+        tip:
+          $ref: '#/components/schemas/Tip'
+        checkoutUrl:
+          type: string
+          nullable: true
+    VerifyTipRequest:
+      required:
+        - verification
+      type: object
+      properties:
+        verification:
+          required:
+            - code
+          type: object
+          properties:
+            code:
+              type: string
+    VerifiedTipResponse:
+      required:
+        - checkoutUrl
+        - guestToken
+        - tip
+      type: object
+      properties:
+        tip:
+          $ref: '#/components/schemas/Tip'
+        checkoutUrl:
+          type: string
+        guestToken:
+          type: string
+    TipResponse:
+      required:
+        - tip
+      type: object
+      properties:
+        tip:
+          $ref: '#/components/schemas/Tip'
+    TipsResponse:
+      required:
+        - tips
+        - tipsCount
+      type: object
+      properties:
+        tips:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tip'
+        tipsCount:
+          type: integer
+    AdminTipsResponse:
+      required:
+        - tips
+        - tipsCount
+      type: object
+      properties:
+        tips:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminTip'
+        tipsCount:
+          type: integer
     GenericErrorModel:
       required:
         - errors

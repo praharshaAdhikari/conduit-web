@@ -30,6 +30,11 @@ export function AdminLayout() {
                 </NavLink>
               </li>
               <li className="nav-item">
+                <NavLink className="nav-link" to={adminPaths.tipsPath}>
+                  Tips
+                </NavLink>
+              </li>
+              <li className="nav-item">
                 <NavLink className="nav-link" to={adminPaths.logPath}>
                   Log
                 </NavLink>

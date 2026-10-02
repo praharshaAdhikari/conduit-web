@@ -13,9 +13,10 @@
  * Pagination: pagination, page-item, page-link
  * Tags: tag-list, tag-default, tag-pill, tag-outline
  * Pages: home-page, auth-page, settings-page, editor-page, profile-page, article-page, admin-page,
- *        membership-page
+ *        membership-page, tip-page
  * Tables: table, list-count, list-filters
  * Status: badge, badge-danger, badge-member, notice, notice-warning
+ * Tips: tip-box
  * Article: article-preview, article-meta, article-content, article-actions, articles-toggle
  * Comments: comment-author, comment-author-img, mod-options, date-posted
  * User: user-info, user-img, user-pic
@@ -23,8 +24,8 @@
  *       preview-link, author, date, info, attribution, active, disabled,
  *       pull-xs-right, text-xs-center, empty-feed-message
  *
- * NOTE: auth-page, settings-page, admin-page, membership-page and empty-feed-message
- * are semantic hooks used in templates but require no dedicated styles.
+ * NOTE: auth-page, settings-page, admin-page, membership-page, tip-page and
+ * empty-feed-message are semantic hooks used in templates but require no dedicated styles.
  *
  * ============================================================================
  */
@@ -1659,4 +1660,34 @@ footer > .container {
 
 .admin-page .nav-pills {
   margin: 1rem 0;
+}
+
+/* ============================================================================
+ * TIPS
+ * ============================================================================ */
+
+.tip-box {
+  clear: both;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.tip-box summary {
+  display: inline-block;
+  list-style: none;
+}
+
+.tip-box summary::-webkit-details-marker {
+  display: none;
+}
+
+.tip-box .card {
+  margin-top: 0.75rem;
+}
+
+.tip-box label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-disabled);
+  font-size: 0.875rem;
 }

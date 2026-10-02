@@ -17,6 +17,10 @@
 >   the user back; it waits for the API to hear that the payment went through. Articles can be marked
 >   members-only in the editor; non-members see a notice instead of the body. The moderation pages gain
 >   memberships and payments, with refunds for admins.
+> - **Tips.** Article and profile pages have a "Tip" form that works with or without an account. A guest is
+>   sent to `/tips/<reference>` to enter the code emailed to them, then on to the payment provider; the same
+>   page is where the provider sends the tipper back. `/tips` lists the tips a user received and sent, and
+>   the moderation pages list them all.
 >
 > New endpoints are added to `openapi.yaml` by hand; `yarn generate` rebuilds the API client from it.
 

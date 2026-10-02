@@ -21,7 +21,8 @@ export function handleApiError<TSuccess extends object = Record<string, never>>(
       throw new Response('Your token is invalid or expired. Please log in again.', { status });
     }
 
-    if (status === 422 || status === 403) {
+    // 429 and 503 come from the emailed codes: too many were sent, or the email could not be sent.
+    if (status === 422 || status === 403 || status === 429 || status === 503) {
       return {
         ok: false,
         errors: error.info?.errors ?? { body: ['Something went wrong.'] },

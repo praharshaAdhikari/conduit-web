@@ -1,34 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Link, useLoaderData, useRevalidator } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
+import { useRevalidateUntil } from '~shared/lib/react-router/useRevalidateUntil';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
 import type { MembershipSuccessLoaderData } from './membership-success.loader';
 import { membershipPaths } from './membership.paths';
-
-const POLL_MS = 1500;
-const GIVE_UP_MS = 30000;
 
 // The user can arrive back from the payment provider before the provider has told the API about the
 // payment, so this page asks again until the membership is active or it has waited long enough.
 export function MembershipSuccessPage() {
   const { membership } = useLoaderData<MembershipSuccessLoaderData>();
-  const { revalidate } = useRevalidator();
-  const [waitedMs, setWaitedMs] = useState(0);
-
   const isConfirmed = Boolean(membership?.hasAccess);
-  const gaveUp = waitedMs >= GIVE_UP_MS;
-
-  useEffect(() => {
-    if (isConfirmed || gaveUp) {
-      return undefined;
-    }
-
-    const timer = setTimeout(() => {
-      setWaitedMs((ms) => ms + POLL_MS);
-      revalidate();
-    }, POLL_MS);
-
-    return () => clearTimeout(timer);
-  }, [isConfirmed, gaveUp, waitedMs, revalidate]);
+  const gaveUp = useRevalidateUntil(isConfirmed);
 
   return (
     <div className="membership-page">

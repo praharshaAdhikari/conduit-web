@@ -8,6 +8,8 @@ import type { ProfileResponse } from '~shared/api/generated/schemas/profileRespo
 import { formatDate } from '~shared/lib/date';
 import { AsyncErrorCard } from '~shared/ui/async-error-card/async-error-card.ui';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
+import { TipForm } from '~pages/tip/tip-form.ui';
+import { tipPaths } from '~pages/tip/tip.paths';
 import type { ProfilePageLoaderData } from './profile.loader';
 import { profilePaths } from './profile.paths';
 import { getProfileArticlesLink, getProfileFavoritedLink } from './profile.state';
@@ -67,11 +69,18 @@ function ProfileInfo({ profile }: ProfileInfoProps) {
       {!isOwnProfile && <ProfileFollowButton profile={profile} />}
 
       {isOwnProfile && (
-        <Link to="/settings" className="btn btn-sm btn-outline-secondary action-btn">
-          <IoSettingsSharp size={14} />
-          &nbsp; Edit Profile Settings
-        </Link>
+        <>
+          <Link to="/settings" className="btn btn-sm btn-outline-secondary action-btn">
+            <IoSettingsSharp size={14} />
+            &nbsp; Edit Profile Settings
+          </Link>
+          <Link to={tipPaths.listPath} className="btn btn-sm btn-outline-secondary action-btn">
+            Your tips
+          </Link>
+        </>
       )}
+
+      {!isOwnProfile && <TipForm author={profile.username} isGuest={!userData} />}
     </>
   );
 }
