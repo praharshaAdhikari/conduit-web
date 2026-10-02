@@ -21,22 +21,10 @@ export default defineConfig({
         path: './generated/schemas',
         type: 'zod',
       },
-      mock: {
-        type: 'msw',
-        delay: 1000,
-      },
       override: {
         mutator: {
           path: './auth-fetch.ts',
           name: 'apiFetch',
-        },
-        mock: {
-          arrayMin: 1,
-          arrayMax: 10,
-          stringMin: 1,
-          stringMax: 20,
-          numberMin: 1,
-          numberMax: 100,
         },
         fetch: {
           runtimeValidation: true,

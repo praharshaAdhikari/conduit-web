@@ -1,5 +1,12 @@
 # 🙌 RealWorld example app 🍰 Feature-Sliced Design
 
+> **About this copy.** This is `conduit-web`, the frontend of a three-repo practice system for learning QA
+> (`conduit-api`, `conduit-web`, `conduit-qa`). It is a copy of
+> [yurisldk/realworld-react-fsd](https://github.com/yurisldk/realworld-react-fsd) (MIT, see `LICENSE`) with its
+> tests, test tooling, Git hooks and CI workflows removed, so they can be rebuilt step by step
+> (`conduit-qa/ROADMAP.md` has the order). It talks to `conduit-api` on `http://localhost:4000/api` and runs on
+> `http://localhost:4100`: `yarn install && yarn generate && yarn start`.
+
 A modern implementation of the [RealWorld](https://github.com/gothinkster/realworld) app built with React, TypeScript, React Router, React Query, and Zod.
 
 ![Realworld example app](./logo.gif)
@@ -18,9 +25,6 @@ This project is an educational and demonstration Medium-clone built with the Fea
 - **TanStack React Query 5**
 - **Zod 4**
 - **Webpack 5**
-- **Jest**
-- **Testing Library**
-- **MSW**
 - **ESLint**
 - **Prettier**
 - **Sass**
@@ -56,7 +60,6 @@ The codebase uses a page-scoped structure rather than a full multi-layer FSD tre
 ## Development Workflow
 
 - Webpack Dev Server is used for local development.
-- Husky hooks are configured for pre-commit and pre-push checks.
 - Generated API code is produced from OpenAPI through Orval and then normalized with a local Zod conversion step.
 - Root `Dockerfile` and `nginx.conf` are used for the containerized frontend build.
 
@@ -74,14 +77,12 @@ The codebase uses a page-scoped structure rather than a full multi-layer FSD tre
 - `yarn build:dev` — builds the app in development mode.
 - `yarn build:prod` — builds the production bundle.
 - `yarn analyze:prod` — builds the production bundle with bundle analyzer enabled.
-- `yarn test` — runs Jest tests.
 - `yarn eslint` — lints and auto-fixes files under `src`.
 - `yarn prettier` — formats the repository with Prettier.
 - `yarn graph` — generates a dependency graph preview for `src`.[^1]
 - `yarn generate` — regenerates API artifacts from the OpenAPI schema.
 - `yarn zod:mini` — post-processes generated Zod artifacts.
 - `yarn format:generated` — formats generated API files.
-- `yarn prepare` — installs Husky hooks.
 
 ## Run
 
