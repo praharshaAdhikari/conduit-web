@@ -1,10 +1,12 @@
-import { Form, Link, useActionData, useNavigation } from 'react-router';
+import { Form, Link, useActionData, useNavigation, useSearchParams } from 'react-router';
 import { ErrorMessages } from '~shared/ui/error-messages/error-messages.ui';
 import type { UserLoginActionData } from './actions/user-login.action';
 
 export function LoginPage() {
   const actionData = useActionData<UserLoginActionData>();
   const navigation = useNavigation();
+  const [searchParams] = useSearchParams();
+  const wasSuspended = searchParams.get('reason') === 'suspended';
 
   const isSubmitting = navigation.state === 'submitting';
 
@@ -17,6 +19,12 @@ export function LoginPage() {
             <p className="text-xs-center">
               <Link to="/register">Need an account?</Link>
             </p>
+
+            {wasSuspended && !actionData && (
+              <p className="notice notice-warning" role="alert">
+                Your account is suspended, so you have been signed out.
+              </p>
+            )}
 
             {actionData && !actionData.ok && <ErrorMessages errors={actionData.errors} />}
 

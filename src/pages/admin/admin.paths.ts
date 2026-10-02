@@ -1,0 +1,15 @@
+export const adminPaths = {
+  users: 'users',
+  articles: 'articles',
+  log: 'log',
+  suspendToggle: 'users/:username/suspend-toggle',
+  role: 'users/:username/role',
+  hideToggle: 'articles/:slug/hide-toggle',
+  rootPath: '/admin',
+  usersPath: '/admin/users',
+  articlesPath: '/admin/articles',
+  logPath: '/admin/log',
+  getSuspendTogglePath: (username: string) => `/admin/users/${username}/suspend-toggle`,
+  getRolePath: (username: string) => `/admin/users/${username}/role`,
+  getHideTogglePath: (slug: string) => `/admin/articles/${slug}/hide-toggle`,
+};

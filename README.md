@@ -7,6 +7,14 @@
 > (`conduit-qa/ROADMAP.md` has the order). It talks to `conduit-api` on `http://localhost:4000/api` and runs on
 > `http://localhost:4100`: `yarn install && yarn generate && yarn start`.
 
+> **Added in this copy**, beyond the RealWorld spec:
+>
+> - **Roles and moderation.** Moderators and admins get a "Moderation" link in the navbar (`/admin`): a user
+>   list with suspend and role controls, an article list with hide and show, and the moderation log. A hidden
+>   article shows a notice to its author and to moderators. The rules are in the `conduit-api` README.
+>
+> New endpoints are added to `openapi.yaml` by hand; `yarn generate` rebuilds the API client from it.
+
 A modern implementation of the [RealWorld](https://github.com/gothinkster/realworld) app built with React, TypeScript, React Router, React Query, and Zod.
 
 ![Realworld example app](./logo.gif)

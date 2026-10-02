@@ -1,6 +1,7 @@
-import { IoCreateOutline, IoSettingsSharp } from 'react-icons/io5';
+import { IoCreateOutline, IoSettingsSharp, IoShieldCheckmarkOutline } from 'react-icons/io5';
 import { useLoaderData, Outlet, NavLink } from 'react-router';
 import { UserResponse } from '~shared/api/generated/schemas/userResponse.zod';
+import { hasRole } from '~shared/lib/roles';
 import { GlobalProgressBar } from '~shared/ui/global-progress-bar/global-progress-bar.ui';
 import { AppLoaderData } from './app.loader';
 
@@ -50,7 +51,7 @@ type UserLinksProps = {
 };
 
 function UserLinks({ user }: UserLinksProps) {
-  const { username, image } = user;
+  const { username, image, role } = user;
 
   return (
     <>
@@ -64,6 +65,13 @@ function UserLinks({ user }: UserLinksProps) {
           <IoSettingsSharp size={16} /> Settings
         </NavLink>
       </li>
+      {hasRole(role, 'moderator') && (
+        <li className="nav-item">
+          <NavLink className="nav-link" to="/admin">
+            <IoShieldCheckmarkOutline size={16} /> Moderation
+          </NavLink>
+        </li>
+      )}
       <li className="nav-item">
         <NavLink className="nav-link" to={`/profile/${username}`}>
           <img className="user-pic" src={image} alt={username} /> {username}

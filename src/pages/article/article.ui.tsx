@@ -4,9 +4,12 @@ import { Await, Link, useFetcher, useLoaderData, useParams } from 'react-router'
 import type { MultipleCommentsResponse } from '~shared/api/generated/schemas/multipleCommentsResponse.zod';
 import type { SingleArticleResponse } from '~shared/api/generated/schemas/singleArticleResponse.zod';
 import { formatDate } from '~shared/lib/date';
+import { hasRole } from '~shared/lib/roles';
 import { AsyncErrorCard } from '~shared/ui/async-error-card/async-error-card.ui';
 import { ErrorMessages } from '~shared/ui/error-messages/error-messages.ui';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
+import type { ArticleHideToggleActionData } from '~pages/admin/actions/article-hide-toggle.action';
+import { adminPaths } from '~pages/admin/admin.paths';
 import type { CommentCreateActionData } from './actions/comment-create.action';
 import type { ArticlePageLoaderData } from './article.loader';
 import { articlePaths } from './article.paths';
@@ -49,6 +52,8 @@ function ArticleContent({ article }: ArticleContentProps) {
       </div>
 
       <div className="container page">
+        <ArticleModeration article={article} />
+
         <div className="row article-content">
           <div className="col-md-12">
             <p>{body}</p>
@@ -71,6 +76,66 @@ function ArticleContent({ article }: ArticleContentProps) {
         </div>
       </div>
     </>
+  );
+}
+
+type ArticleModerationProps = {
+  article: SingleArticleResponse['article'];
+};
+
+// A hidden article only loads for its author and for moderators; moderators can hide and show it here.
+function ArticleModeration({ article }: ArticleModerationProps) {
+  const { slug = '' } = useParams();
+  const { userData } = useLoaderData<ArticlePageLoaderData>();
+  const hideFetcher = useFetcher<ArticleHideToggleActionData>({ key: `article-hide-toggle-${slug}` });
+
+  const { hidden, hiddenReason } = article;
+  const isModerator = hasRole(userData?.user?.role, 'moderator');
+  const isPending = hideFetcher.state !== 'idle';
+
+  if (!hidden && !isModerator) {
+    return null;
+  }
+
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        {hidden && (
+          <p className="notice notice-warning" role="status" data-test="article-hidden-notice">
+            <strong>This article is hidden.</strong> Only its author and moderators can see it. Reason: {hiddenReason}
+          </p>
+        )}
+        {isModerator && (
+          <hideFetcher.Form
+            key={String(hidden)}
+            method="post"
+            action={adminPaths.getHideTogglePath(slug)}
+            className="inline-form"
+          >
+            <input type="hidden" name="operation" value={hidden ? 'unhide' : 'hide'} />
+            {!hidden && (
+              <input
+                className="form-control form-control-sm"
+                type="text"
+                name="reason"
+                placeholder="Reason for hiding this article"
+                aria-label="Reason for hiding this article"
+                maxLength={255}
+                required
+              />
+            )}
+            <button
+              className={hidden ? 'btn btn-sm btn-outline-secondary' : 'btn btn-sm btn-outline-danger'}
+              type="submit"
+              disabled={isPending}
+            >
+              {hidden ? 'Show article' : 'Hide article'}
+            </button>
+          </hideFetcher.Form>
+        )}
+        {hideFetcher.data && !hideFetcher.data.ok && <ErrorMessages errors={hideFetcher.data.errors} />}
+      </div>
+    </div>
   );
 }
 

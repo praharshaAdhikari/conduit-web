@@ -2,6 +2,7 @@ import { Link, createBrowserRouter, isRouteErrorResponse, redirect, useRouteErro
 import { getErrorMessage } from '~shared/lib/react-router/getErrorMessage';
 import { loadUserMiddleware } from '~shared/lib/react-router/loadUserMiddleware';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
+import { adminRoute } from '~pages/admin/admin.route';
 import { articleRoute } from '~pages/article/article.route';
 import { editorRoute } from '~pages/editor/editor.route';
 import { homeRoute } from '~pages/home/home.route';
@@ -21,7 +22,16 @@ export const browserRouter = () =>
       Component: Layout,
       loader: appLoader,
       ErrorBoundary: RootErrorBoundary,
-      children: [loginRoute, registerRoute, settingsRoute, homeRoute, profileRoute, articleRoute, editorRoute],
+      children: [
+        loginRoute,
+        registerRoute,
+        settingsRoute,
+        homeRoute,
+        profileRoute,
+        articleRoute,
+        editorRoute,
+        adminRoute,
+      ],
       hydrateFallbackElement: <Spinner />,
     },
     page404Route,
@@ -34,6 +44,7 @@ export const browserRouter = () =>
 function RootErrorBoundary() {
   const error = useRouteError();
   const isUnauthorized = isRouteErrorResponse(error) && error.status === 401;
+  const isForbidden = isRouteErrorResponse(error) && error.status === 403;
 
   return (
     <div className="container page">
@@ -42,7 +53,7 @@ function RootErrorBoundary() {
           <div className="card">
             <div className="card-block">
               <p className="card-text">
-                <strong>{isUnauthorized ? 'Authentication expired' : 'Page unavailable'}</strong>
+                <strong>{isUnauthorized ? 'Authentication expired' : pageErrorTitle(isForbidden)}</strong>
               </p>
               <p className="card-text">
                 {getErrorMessage(
@@ -63,4 +74,8 @@ function RootErrorBoundary() {
       </div>
     </div>
   );
+}
+
+function pageErrorTitle(isForbidden: boolean) {
+  return isForbidden ? 'Not allowed' : 'Page unavailable';
 }

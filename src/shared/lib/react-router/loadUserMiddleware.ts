@@ -1,3 +1,4 @@
+import { redirect } from 'react-router';
 import type { MiddlewareFunction } from 'react-router';
 import { clearToken, getToken, setToken } from '~shared/api/auth-storage';
 import {
@@ -38,6 +39,14 @@ export const loadUserMiddleware: MiddlewareFunction = async ({ request, context 
       queryClient.setQueryData(getGetCurrentUserQueryKey(), null);
       context.set(userContext, null);
       return next();
+    }
+
+    // The account was suspended after this token was issued.
+    if (isApiTransportError(error) && error.status === 403) {
+      clearToken();
+      queryClient.setQueryData(getGetCurrentUserQueryKey(), null);
+      context.set(userContext, null);
+      throw redirect('/login?reason=suspended');
     }
 
     throw error;

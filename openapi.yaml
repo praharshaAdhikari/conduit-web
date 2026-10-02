@@ -10,6 +10,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: 1.0.0
 tags:
+  - name: Admin
   - name: Articles
   - name: Comments
   - name: Favorites
@@ -677,6 +678,370 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericErrorModel'
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users. Moderators only
+      operationId: GetAdminUsers
+      parameters:
+        - name: search
+          in: query
+          description: Part of a username or email
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUsersResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/users/{username}/suspend:
+    post:
+      tags:
+        - Admin
+      summary: Suspend a user. Moderators only
+      operationId: SuspendUser
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerationRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+    delete:
+      tags:
+        - Admin
+      summary: Lift a suspension. Moderators only
+      operationId: UnsuspendUser
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/users/{username}/role:
+    put:
+      tags:
+        - Admin
+      summary: Set a user's role. Admins only
+      operationId: SetUserRole
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetRoleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/articles:
+    get:
+      tags:
+        - Admin
+      summary: List all articles, hidden ones included. Moderators only
+      operationId: GetAdminArticles
+      parameters:
+        - name: hidden
+          in: query
+          description: Only hidden ("true") or only visible ("false") articles
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminArticlesResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/articles/{slug}/hide:
+    post:
+      tags:
+        - Admin
+      summary: Hide an article. Moderators only
+      operationId: HideArticle
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the article
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerationRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminArticleResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+    delete:
+      tags:
+        - Admin
+      summary: Show a hidden article again. Moderators only
+      operationId: UnhideArticle
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the article
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminArticleResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/actions:
+    get:
+      tags:
+        - Admin
+      summary: The moderation log, newest first. Moderators only
+      operationId: GetModerationActions
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerationActionsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
 components:
   schemas:
     LoginUser:
@@ -708,6 +1073,7 @@ components:
       required:
         - email
         - image
+        - role
         - token
         - username
       type: object
@@ -723,6 +1089,8 @@ components:
           type: string
         token:
           type: string
+        role:
+          $ref: '#/components/schemas/Role'
     UpdateUser:
       type: object
       properties:
@@ -760,6 +1128,7 @@ components:
         - description
         - favorited
         - favoritesCount
+        - hidden
         - slug
         - tagList
         - title
@@ -788,6 +1157,11 @@ components:
           type: boolean
         favoritesCount:
           type: integer
+        hidden:
+          type: boolean
+        hiddenReason:
+          type: string
+          nullable: true
         author:
           $ref: '#/components/schemas/Profile'
     NewArticle:
@@ -848,6 +1222,176 @@ components:
       properties:
         body:
           type: string
+    Role:
+      type: string
+      enum:
+        - user
+        - moderator
+        - admin
+    AdminUser:
+      required:
+        - createdAt
+        - email
+        - role
+        - suspended
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        suspended:
+          type: boolean
+        suspendedAt:
+          type: string
+          nullable: true
+        suspendedReason:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    AdminArticle:
+      required:
+        - author
+        - createdAt
+        - hidden
+        - slug
+        - title
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        hidden:
+          type: boolean
+        hiddenAt:
+          type: string
+          nullable: true
+        hiddenBy:
+          type: string
+          nullable: true
+        hiddenReason:
+          type: string
+          nullable: true
+    ModerationAction:
+      required:
+        - action
+        - createdAt
+        - id
+        - moderator
+        - target
+        - targetType
+      type: object
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+          enum:
+            - suspend
+            - unsuspend
+            - hide
+            - unhide
+            - set_role
+        moderator:
+          type: string
+        targetType:
+          type: string
+          enum:
+            - user
+            - article
+        target:
+          type: string
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    ModerationRequest:
+      required:
+        - moderation
+      type: object
+      properties:
+        moderation:
+          required:
+            - reason
+          type: object
+          properties:
+            reason:
+              type: string
+    SetRoleRequest:
+      required:
+        - user
+      type: object
+      properties:
+        user:
+          required:
+            - role
+          type: object
+          properties:
+            role:
+              $ref: '#/components/schemas/Role'
+    AdminUserResponse:
+      required:
+        - user
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/AdminUser'
+    AdminUsersResponse:
+      required:
+        - users
+        - usersCount
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUser'
+        usersCount:
+          type: integer
+    AdminArticleResponse:
+      required:
+        - article
+      type: object
+      properties:
+        article:
+          $ref: '#/components/schemas/AdminArticle'
+    AdminArticlesResponse:
+      required:
+        - articles
+        - articlesCount
+      type: object
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminArticle'
+        articlesCount:
+          type: integer
+    ModerationActionsResponse:
+      required:
+        - actions
+        - actionsCount
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModerationAction'
+        actionsCount:
+          type: integer
     GenericErrorModel:
       required:
         - errors
