@@ -71,6 +71,27 @@ export const adminRoute = {
       },
     },
     {
+      path: adminPaths.reconcile,
+      middleware: [requireRoleMiddleware('admin')],
+      lazy: async () => {
+        const { reconcileAction: action } = await import('~pages/admin/actions/reconcile.action');
+        return { action };
+      },
+    },
+    {
+      path: adminPaths.membershipHistory,
+      lazy: async () => {
+        const [{ AdminMembershipHistoryPage: Component }, { adminMembershipHistoryLoader: loader }] = await Promise.all(
+          [
+            import('~pages/admin/memberships/admin-membership-history.ui'),
+            import('~pages/admin/memberships/admin-membership-history.loader'),
+          ],
+        );
+
+        return { Component, loader };
+      },
+    },
+    {
       path: adminPaths.payments,
       lazy: async () => {
         const [{ AdminPaymentsPage: Component }, { adminPaymentsLoader: loader }] = await Promise.all([

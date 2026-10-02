@@ -21,6 +21,9 @@
 >   sent to `/tips/<reference>` to enter the code emailed to them, then on to the payment provider; the same
 >   page is where the provider sends the tipper back. `/tips` lists the tips a user received and sent, and
 >   the moderation pages list them all.
+> - **Membership history and the reconcile job.** The membership page shows what happened to the membership
+>   and warns when a payment is overdue. For moderators, each membership has a history page, and the
+>   memberships page shows the reconcile job's recent runs; admins can run it from there.
 >
 > New endpoints are added to `openapi.yaml` by hand; `yarn generate` rebuilds the API client from it.
 

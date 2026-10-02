@@ -7,11 +7,12 @@ import { formatMoney } from '~shared/lib/money';
 import { ErrorMessages } from '~shared/ui/error-messages/error-messages.ui';
 import type { MembershipCancelToggleActionData } from './actions/membership-cancel-toggle.action';
 import type { MembershipCheckoutActionData } from './actions/membership-checkout.action';
+import { MembershipHistoryTable } from './membership-history.ui';
 import type { MembershipPageLoaderData } from './membership.loader';
 import { membershipPaths } from './membership.paths';
 
 export function MembershipPage() {
-  const { plans, membership, paymentsData } = useLoaderData<MembershipPageLoaderData>();
+  const { plans, membership, paymentsData, historyData } = useLoaderData<MembershipPageLoaderData>();
 
   return (
     <div className="membership-page">
@@ -21,13 +22,25 @@ export function MembershipPage() {
             <h1>Membership</h1>
             <p>Members can read every members-only article.</p>
 
-            {membership?.hasAccess ? (
-              <CurrentMembership membership={membership} plans={plans} />
-            ) : (
+            {membership?.hasAccess && <CurrentMembership membership={membership} plans={plans} />}
+            {membership && !membership.hasAccess && membership.status === 'past_due' && (
+              <p className="notice notice-warning" role="status" data-test="membership-overdue">
+                Your payment has been overdue for too long and your access has ended. The membership will be closed
+                within a day; after that you can join again.
+              </p>
+            )}
+            {!membership?.hasAccess && membership?.status !== 'past_due' && (
               <JoinMembership membership={membership ?? null} plans={plans} />
             )}
 
             {paymentsData.payments.length > 0 && <PaymentsTable payments={paymentsData.payments} />}
+
+            {historyData.events.length > 0 && (
+              <>
+                <h4>What happened to your membership</h4>
+                <MembershipHistoryTable events={historyData.events} />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -48,7 +61,7 @@ function CurrentMembership({ membership, plans }: CurrentMembershipProps) {
   const cancelFetcher = useFetcher<MembershipCancelToggleActionData>({ key: 'membership-cancel-toggle' });
   const isPending = cancelFetcher.state !== 'idle';
 
-  const { status, cancelAtPeriodEnd, currentPeriodEnd } = membership;
+  const { status, cancelAtPeriodEnd, currentPeriodEnd, graceEndsAt } = membership;
   const plan = plans.find(({ id }) => id === membership.plan);
   const periodEnd = formatDate(currentPeriodEnd ?? undefined);
 
@@ -68,8 +81,9 @@ function CurrentMembership({ membership, plans }: CurrentMembershipProps) {
         )}
 
         {status === 'past_due' && (
-          <p className="notice notice-warning" role="status">
-            Your last payment failed. You keep your access while the payment provider tries again.
+          <p className="notice notice-warning" role="status" data-test="membership-past-due">
+            Your last payment failed. You keep your access until {formatDate(graceEndsAt ?? undefined)}; after that the
+            membership ends.
           </p>
         )}
         {status === 'active' && cancelAtPeriodEnd && (
@@ -117,9 +131,9 @@ function JoinMembership({ membership, plans }: JoinMembershipProps) {
           You started a checkout and did not finish it. Choose a plan to try again.
         </p>
       )}
-      {(membership?.status === 'cancelled' || membership?.status === 'lapsed') && (
+      {membership?.endedAt && (membership.status === 'cancelled' || membership.status === 'lapsed') && (
         <p className="notice" role="status" data-test="membership-ended">
-          Your membership ended on {formatDate(membership.endedAt ?? undefined)}. Choose a plan to join again.
+          Your membership ended on {formatDate(membership.endedAt)}. Choose a plan to join again.
         </p>
       )}
 

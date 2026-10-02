@@ -1611,6 +1611,189 @@ paths:
                 $ref: '#/components/schemas/GenericErrorModel'
       security:
         - Token: []
+  /membership/history:
+    get:
+      tags:
+        - Membership
+      summary: What happened to the current user's membership, newest first
+      operationId: GetMembershipHistory
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipEventsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/memberships/{username}/history:
+    get:
+      tags:
+        - Admin
+      summary: What happened to a user's membership. Moderators only
+      operationId: GetAdminMembershipHistory
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipEventsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '404':
+          description: No such user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/memberships/reconcile:
+    post:
+      tags:
+        - Admin
+      summary: Run the reconcile job now. Admins only
+      operationId: RunReconcile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconcileRunResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '409':
+          description: The job is already running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/reconcile-runs:
+    get:
+      tags:
+        - Admin
+      summary: Earlier runs of the reconcile job, newest first. Moderators only
+      operationId: GetReconcileRuns
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconcileRunsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
 components:
   schemas:
     LoginUser:
@@ -2047,6 +2230,9 @@ components:
           nullable: true
         cancelAtPeriodEnd:
           type: boolean
+        graceEndsAt:
+          type: string
+          nullable: true
         startedAt:
           type: string
           nullable: true
@@ -2110,6 +2296,9 @@ components:
           nullable: true
         cancelAtPeriodEnd:
           type: boolean
+        graceEndsAt:
+          type: string
+          nullable: true
         startedAt:
           type: string
           nullable: true
@@ -2409,6 +2598,121 @@ components:
           items:
             $ref: '#/components/schemas/AdminTip'
         tipsCount:
+          type: integer
+    MembershipEvent:
+      required:
+        - createdAt
+        - reason
+        - source
+        - to
+      type: object
+      properties:
+        from:
+          type: string
+          nullable: true
+        to:
+          $ref: '#/components/schemas/MembershipStatus'
+        reason:
+          type: string
+        source:
+          type: string
+          enum:
+            - member
+            - webhook
+            - reconcile
+            - admin
+        detail:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    MembershipEventsResponse:
+      required:
+        - events
+        - eventsCount
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/MembershipEvent'
+        eventsCount:
+          type: integer
+    ReconcileChange:
+      required:
+        - from
+        - reason
+        - to
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        reason:
+          type: string
+    ReconcileRun:
+      required:
+        - checkoutsExpired
+        - errors
+        - id
+        - membershipsChanged
+        - membershipsChecked
+        - startedAt
+        - startedBy
+        - tipsExpired
+      type: object
+      properties:
+        id:
+          type: integer
+        startedBy:
+          type: string
+          enum:
+            - schedule
+            - command
+            - admin
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          nullable: true
+        membershipsChecked:
+          type: integer
+        membershipsChanged:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReconcileChange'
+        checkoutsExpired:
+          type: integer
+        tipsExpired:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+    ReconcileRunResponse:
+      required:
+        - run
+      type: object
+      properties:
+        run:
+          $ref: '#/components/schemas/ReconcileRun'
+    ReconcileRunsResponse:
+      required:
+        - runs
+        - runsCount
+      type: object
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReconcileRun'
+        runsCount:
           type: integer
     GenericErrorModel:
       required:
