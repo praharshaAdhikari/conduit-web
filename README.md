@@ -12,6 +12,11 @@
 > - **Roles and moderation.** Moderators and admins get a "Moderation" link in the navbar (`/admin`): a user
 >   list with suspend and role controls, an article list with hide and show, and the moderation log. A hidden
 >   article shows a notice to its author and to moderators. The rules are in the `conduit-api` README.
+> - **Memberships.** `/membership` shows the plans, sends the user to the payment provider's checkout, and
+>   afterwards shows the membership with cancel and resume. `/membership/success` is where the provider sends
+>   the user back; it waits for the API to hear that the payment went through. Articles can be marked
+>   members-only in the editor; non-members see a notice instead of the body. The moderation pages gain
+>   memberships and payments, with refunds for admins.
 >
 > New endpoints are added to `openapi.yaml` by hand; `yarn generate` rebuilds the API client from it.
 

@@ -40,13 +40,20 @@ type ArticleContentProps = {
 };
 
 function ArticleContent({ article }: ArticleContentProps) {
-  const { title, body, tagList } = article;
+  const { title, description, body, tagList, membersOnly, locked } = article;
 
   return (
     <>
       <div className="banner">
         <div className="container">
           <h1>{title}</h1>
+          {membersOnly && (
+            <p>
+              <span className="badge badge-member" data-test="article-members-only">
+                Members only
+              </span>
+            </p>
+          )}
           <ArticleActionsBlock article={article} />
         </div>
       </div>
@@ -56,7 +63,7 @@ function ArticleContent({ article }: ArticleContentProps) {
 
         <div className="row article-content">
           <div className="col-md-12">
-            <p>{body}</p>
+            {locked ? <ArticleLocked description={description} /> : <p>{body}</p>}
             {tagList.length > 0 && (
               <ul className="tag-list">
                 {tagList.map((tag) => (
@@ -75,6 +82,33 @@ function ArticleContent({ article }: ArticleContentProps) {
           <ArticleActionsBlock article={article} />
         </div>
       </div>
+    </>
+  );
+}
+
+type ArticleLockedProps = {
+  description: string;
+};
+
+// The API withholds the body of a members-only article from everyone but members, its author and moderators.
+function ArticleLocked({ description }: ArticleLockedProps) {
+  const { userData } = useLoaderData<ArticlePageLoaderData>();
+
+  return (
+    <>
+      <p>{description}</p>
+      <p className="notice" role="status" data-test="article-locked-notice">
+        <strong>This article is for members.</strong>{' '}
+        {userData ? (
+          <>
+            <Link to="/membership">Become a member</Link> to read it.
+          </>
+        ) : (
+          <>
+            <Link to="/login">Sign in</Link> and become a member to read it.
+          </>
+        )}
+      </p>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { IoCreateOutline, IoSettingsSharp, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { IoCreateOutline, IoSettingsSharp, IoShieldCheckmarkOutline, IoStarOutline } from 'react-icons/io5';
 import { useLoaderData, Outlet, NavLink } from 'react-router';
 import { UserResponse } from '~shared/api/generated/schemas/userResponse.zod';
 import { hasRole } from '~shared/lib/roles';
@@ -63,6 +63,11 @@ function UserLinks({ user }: UserLinksProps) {
       <li className="nav-item">
         <NavLink className="nav-link" to="/settings">
           <IoSettingsSharp size={16} /> Settings
+        </NavLink>
+      </li>
+      <li className="nav-item">
+        <NavLink className="nav-link" to="/membership">
+          <IoStarOutline size={16} /> Membership
         </NavLink>
       </li>
       {hasRole(role, 'moderator') && (

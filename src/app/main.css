@@ -8,13 +8,14 @@
  * Layout: container, row, col-xs-12, col-md-{3,6,8,9,10,12}, offset-md-{1,2,3}
  * Nav: navbar, navbar-{light,brand,nav}, nav, nav-{pills,item,link}, outline-active
  * Buttons: btn, btn-{sm,lg,primary,secondary}, btn-outline-{primary,secondary,danger}
- * Forms: form-group, form-control, form-control-{lg,sm}, inline-form
+ * Forms: form-group, form-control, form-control-{lg,sm}, inline-form, form-check
  * Cards: card, card-{block,footer,text}, comment-form
  * Pagination: pagination, page-item, page-link
  * Tags: tag-list, tag-default, tag-pill, tag-outline
- * Pages: home-page, auth-page, settings-page, editor-page, profile-page, article-page, admin-page
+ * Pages: home-page, auth-page, settings-page, editor-page, profile-page, article-page, admin-page,
+ *        membership-page
  * Tables: table, list-count, list-filters
- * Status: badge, badge-danger, notice, notice-warning
+ * Status: badge, badge-danger, badge-member, notice, notice-warning
  * Article: article-preview, article-meta, article-content, article-actions, articles-toggle
  * Comments: comment-author, comment-author-img, mod-options, date-posted
  * User: user-info, user-img, user-pic
@@ -22,8 +23,8 @@
  *       preview-link, author, date, info, attribution, active, disabled,
  *       pull-xs-right, text-xs-center, empty-feed-message
  *
- * NOTE: auth-page, settings-page, admin-page and empty-feed-message are semantic
- * hooks used in templates but require no dedicated styles.
+ * NOTE: auth-page, settings-page, admin-page, membership-page and empty-feed-message
+ * are semantic hooks used in templates but require no dedicated styles.
  *
  * ============================================================================
  */
@@ -461,6 +462,16 @@ fieldset {
 
 .form-group {
   margin-bottom: 1rem;
+}
+
+.form-check {
+  display: block;
+  color: var(--text-disabled);
+  cursor: pointer;
+}
+
+.form-check input {
+  margin-right: 0.35rem;
 }
 
 /* A field and its button side by side. */
@@ -1620,6 +1631,11 @@ footer > .container {
   color: var(--text-disabled);
   background-color: var(--bg-light);
   border-radius: 10rem;
+}
+
+.badge-member {
+  color: #fff;
+  background-color: var(--brand);
 }
 
 .badge-danger {

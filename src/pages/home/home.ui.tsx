@@ -119,7 +119,7 @@ type HomeArticlePreviewCardProps = {
 };
 
 function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
-  const { author, updatedAt, slug, title, description, tagList } = article;
+  const { author, updatedAt, slug, title, description, tagList, membersOnly } = article;
   const { username, image } = author;
 
   return (
@@ -142,6 +142,7 @@ function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
 
       <Link className="preview-link" to={`/article/${slug}`}>
         <h1>{title}</h1>
+        {membersOnly && <span className="badge badge-member">Members only</span>}
         <p>{description}</p>
         <span>Read more...</span>
         <ul className="tag-list">

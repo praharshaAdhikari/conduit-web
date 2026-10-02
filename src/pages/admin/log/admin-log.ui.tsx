@@ -9,6 +9,14 @@ const ACTION_LABELS: Record<ModerationAction['action'], string> = {
   hide: 'Hid',
   unhide: 'Showed',
   set_role: 'Changed the role of',
+  refund: 'Refunded payment',
+};
+
+// A payment has no page of its own to link to.
+const TARGET_LINKS: Record<ModerationAction['targetType'], ((target: string) => string) | null> = {
+  user: (target) => `/profile/${target}`,
+  article: (target) => `/article/${target}`,
+  payment: null,
 };
 
 const logDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -41,8 +49,7 @@ export function AdminLogPage() {
               <td>{logDateFormatter.format(new Date(createdAt))}</td>
               <td>{moderator}</td>
               <td>
-                {ACTION_LABELS[action]}{' '}
-                <Link to={targetType === 'user' ? `/profile/${target}` : `/article/${target}`}>{target}</Link>
+                {ACTION_LABELS[action]} <LogTarget targetType={targetType} target={target} />
               </td>
               <td>{note}</td>
             </tr>
@@ -53,4 +60,14 @@ export function AdminLogPage() {
       <AdminPagination pagination={pagination} count={actionsData.actionsCount} />
     </>
   );
+}
+
+type LogTargetProps = {
+  targetType: ModerationAction['targetType'];
+  target: string;
+};
+
+function LogTarget({ targetType, target }: LogTargetProps) {
+  const link = TARGET_LINKS[targetType];
+  return link ? <Link to={link(target)}>{target}</Link> : <span>{target}</span>;
 }

@@ -14,6 +14,7 @@ tags:
   - name: Articles
   - name: Comments
   - name: Favorites
+  - name: Membership
   - name: Profile
   - name: Tags
   - name: User and Authentication
@@ -1042,6 +1043,326 @@ paths:
                 $ref: '#/components/schemas/GenericErrorModel'
       security:
         - Token: []
+  /membership/plans:
+    get:
+      tags:
+        - Membership
+      summary: The membership plans and their prices
+      operationId: GetMembershipPlans
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlansResponse'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+  /membership:
+    get:
+      tags:
+        - Membership
+      summary: The current user's membership, or null
+      operationId: GetMembership
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /membership/checkout:
+    post:
+      tags:
+        - Membership
+      summary: Start paying for a membership; returns the address of the checkout
+      operationId: StartMembershipCheckout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipCheckoutRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /membership/cancel:
+    post:
+      tags:
+        - Membership
+      summary: Stop the membership at the end of the paid period
+      operationId: CancelMembership
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /membership/resume:
+    post:
+      tags:
+        - Membership
+      summary: Take a cancellation back
+      operationId: ResumeMembership
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /membership/payments:
+    get:
+      tags:
+        - Membership
+      summary: The current user's payments, newest first
+      operationId: GetMembershipPayments
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/memberships:
+    get:
+      tags:
+        - Admin
+      summary: List all memberships. Moderators only
+      operationId: GetAdminMemberships
+      parameters:
+        - name: status
+          in: query
+          description: Only memberships with this status
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMembershipsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/payments:
+    get:
+      tags:
+        - Admin
+      summary: List all payments. Moderators only
+      operationId: GetAdminPayments
+      parameters:
+        - name: kind
+          in: query
+          description: Only payments of this kind (membership or tip)
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Only payments with this status
+          schema:
+            type: string
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set.
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+          description: The numbers of items to return.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminPaymentsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
+  /admin/payments/{id}/refund:
+    post:
+      tags:
+        - Admin
+      summary: Refund a payment. Admins only
+      operationId: RefundPayment
+      parameters:
+        - name: id
+          in: path
+          description: Id of the payment
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminPaymentResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '403':
+          description: The role does not allow this
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+        '422':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorModel'
+      security:
+        - Token: []
 components:
   schemas:
     LoginUser:
@@ -1073,6 +1394,7 @@ components:
       required:
         - email
         - image
+        - membership
         - role
         - token
         - username
@@ -1091,6 +1413,10 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/Role'
+        membership:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Membership'
     UpdateUser:
       type: object
       properties:
@@ -1108,6 +1434,7 @@ components:
       required:
         - following
         - image
+        - member
         - username
       type: object
       properties:
@@ -1120,6 +1447,8 @@ components:
           type: string
         following:
           type: boolean
+        member:
+          type: boolean
     Article:
       required:
         - author
@@ -1129,6 +1458,8 @@ components:
         - favorited
         - favoritesCount
         - hidden
+        - locked
+        - membersOnly
         - slug
         - tagList
         - title
@@ -1157,6 +1488,10 @@ components:
           type: boolean
         favoritesCount:
           type: integer
+        membersOnly:
+          type: boolean
+        locked:
+          type: boolean
         hidden:
           type: boolean
         hiddenReason:
@@ -1181,6 +1516,8 @@ components:
           type: array
           items:
             type: string
+        membersOnly:
+          type: boolean
     UpdateArticle:
       type: object
       properties:
@@ -1194,6 +1531,8 @@ components:
           type: array
           items:
             type: string
+        membersOnly:
+          type: boolean
     Comment:
       required:
         - author
@@ -1303,6 +1642,7 @@ components:
             - hide
             - unhide
             - set_role
+            - refund
         moderator:
           type: string
         targetType:
@@ -1310,6 +1650,7 @@ components:
           enum:
             - user
             - article
+            - payment
         target:
           type: string
         note:
@@ -1392,6 +1733,259 @@ components:
             $ref: '#/components/schemas/ModerationAction'
         actionsCount:
           type: integer
+    PlanId:
+      type: string
+      enum:
+        - monthly
+        - yearly
+    MembershipStatus:
+      type: string
+      enum:
+        - pending
+        - active
+        - past_due
+        - cancelled
+        - lapsed
+    PaymentKind:
+      type: string
+      enum:
+        - membership
+        - tip
+    PaymentStatus:
+      type: string
+      enum:
+        - pending
+        - succeeded
+        - expired
+        - refunded
+    Plan:
+      required:
+        - amountCents
+        - currency
+        - id
+        - interval
+        - name
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/PlanId'
+        name:
+          type: string
+        amountCents:
+          type: integer
+        currency:
+          type: string
+        interval:
+          type: string
+          enum:
+            - month
+            - year
+    Membership:
+      required:
+        - cancelAtPeriodEnd
+        - hasAccess
+        - plan
+        - status
+      type: object
+      properties:
+        plan:
+          $ref: '#/components/schemas/PlanId'
+        status:
+          $ref: '#/components/schemas/MembershipStatus'
+        hasAccess:
+          type: boolean
+        currentPeriodEnd:
+          type: string
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        startedAt:
+          type: string
+          nullable: true
+        endedAt:
+          type: string
+          nullable: true
+    Payment:
+      required:
+        - amountCents
+        - createdAt
+        - currency
+        - description
+        - id
+        - kind
+        - status
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          $ref: '#/components/schemas/PaymentKind'
+        amountCents:
+          type: integer
+        currency:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        createdAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          nullable: true
+        refundedAt:
+          type: string
+          nullable: true
+    AdminMembership:
+      required:
+        - cancelAtPeriodEnd
+        - email
+        - hasAccess
+        - plan
+        - status
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        plan:
+          $ref: '#/components/schemas/PlanId'
+        status:
+          $ref: '#/components/schemas/MembershipStatus'
+        hasAccess:
+          type: boolean
+        currentPeriodEnd:
+          type: string
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        startedAt:
+          type: string
+          nullable: true
+        endedAt:
+          type: string
+          nullable: true
+    AdminPayment:
+      required:
+        - amountCents
+        - createdAt
+        - currency
+        - description
+        - id
+        - kind
+        - provider
+        - status
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          $ref: '#/components/schemas/PaymentKind'
+        amountCents:
+          type: integer
+        currency:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        createdAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          nullable: true
+        refundedAt:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        provider:
+          type: string
+    PlansResponse:
+      required:
+        - plans
+      type: object
+      properties:
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+    MembershipResponse:
+      required:
+        - membership
+      type: object
+      properties:
+        membership:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Membership'
+    MembershipCheckoutRequest:
+      required:
+        - membership
+      type: object
+      properties:
+        membership:
+          required:
+            - plan
+          type: object
+          properties:
+            plan:
+              $ref: '#/components/schemas/PlanId'
+    CheckoutResponse:
+      required:
+        - checkoutUrl
+      type: object
+      properties:
+        checkoutUrl:
+          type: string
+    PaymentsResponse:
+      required:
+        - payments
+        - paymentsCount
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        paymentsCount:
+          type: integer
+    AdminMembershipsResponse:
+      required:
+        - memberships
+        - membershipsCount
+      type: object
+      properties:
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminMembership'
+        membershipsCount:
+          type: integer
+    AdminPaymentsResponse:
+      required:
+        - payments
+        - paymentsCount
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminPayment'
+        paymentsCount:
+          type: integer
+    AdminPaymentResponse:
+      required:
+        - payment
+      type: object
+      properties:
+        payment:
+          $ref: '#/components/schemas/AdminPayment'
     GenericErrorModel:
       required:
         - errors
@@ -1455,6 +2049,7 @@ components:
         - description
         - favorited
         - favoritesCount
+        - membersOnly
         - slug
         - tagList
         - title
@@ -1481,6 +2076,8 @@ components:
           type: boolean
         favoritesCount:
           type: integer
+        membersOnly:
+          type: boolean
         author:
           $ref: '#/components/schemas/Profile'
     UserResponse:

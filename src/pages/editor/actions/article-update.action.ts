@@ -27,7 +27,8 @@ export async function articleUpdateAction({ request, params }: ActionFunctionArg
   const formData = await request.formData();
   const fields = Object.fromEntries(formData);
   const validation = validateSchema(UpdateArticleBody, {
-    article: { ...fields, tagList: parseTags(fields.tagList) },
+    // An unticked checkbox is left out of the form data altogether.
+    article: { ...fields, tagList: parseTags(fields.tagList), membersOnly: fields.membersOnly === 'on' },
   });
 
   if (!validation.ok) {

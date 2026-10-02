@@ -37,6 +37,7 @@ function EditorForm({ article }: EditorFormProps) {
   const description = article?.description ?? '';
   const body = article?.body ?? '';
   const tagListText = article?.tagList?.join(' ') ?? '';
+  const membersOnly = article?.membersOnly ?? false;
 
   return (
     <div className="editor-page">
@@ -82,6 +83,12 @@ function EditorForm({ article }: EditorFormProps) {
                     placeholder="Enter tags"
                     defaultValue={tagListText}
                   />
+                </fieldset>
+                <fieldset className="form-group">
+                  <label className="form-check" htmlFor="membersOnly">
+                    <input type="checkbox" id="membersOnly" name="membersOnly" defaultChecked={membersOnly} /> Members
+                    only: non-members see the title and description, not the article
+                  </label>
                 </fieldset>
                 <button className="btn btn-lg pull-xs-right btn-primary" type="submit" disabled={isSubmitting}>
                   Publish Article

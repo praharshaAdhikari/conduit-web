@@ -60,6 +60,36 @@ export const adminRoute = {
       },
     },
     {
+      path: adminPaths.memberships,
+      lazy: async () => {
+        const [{ AdminMembershipsPage: Component }, { adminMembershipsLoader: loader }] = await Promise.all([
+          import('~pages/admin/memberships/admin-memberships.ui'),
+          import('~pages/admin/memberships/admin-memberships.loader'),
+        ]);
+
+        return { Component, loader };
+      },
+    },
+    {
+      path: adminPaths.payments,
+      lazy: async () => {
+        const [{ AdminPaymentsPage: Component }, { adminPaymentsLoader: loader }] = await Promise.all([
+          import('~pages/admin/payments/admin-payments.ui'),
+          import('~pages/admin/payments/admin-payments.loader'),
+        ]);
+
+        return { Component, loader };
+      },
+    },
+    {
+      path: adminPaths.refund,
+      middleware: [requireRoleMiddleware('admin')],
+      lazy: async () => {
+        const { paymentRefundAction: action } = await import('~pages/admin/actions/payment-refund.action');
+        return { action };
+      },
+    },
+    {
       path: adminPaths.log,
       lazy: async () => {
         const [{ AdminLogPage: Component }, { adminLogLoader: loader }] = await Promise.all([

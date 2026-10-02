@@ -7,6 +7,7 @@ import { articleRoute } from '~pages/article/article.route';
 import { editorRoute } from '~pages/editor/editor.route';
 import { homeRoute } from '~pages/home/home.route';
 import { loginRoute } from '~pages/login/login.route';
+import { membershipCancelledRoute, membershipRoute, membershipSuccessRoute } from '~pages/membership/membership.route';
 import { page404Route } from '~pages/page-404/page-404.route';
 import { profileRoute } from '~pages/profile/profile.route';
 import { registerRoute } from '~pages/register/register.route';
@@ -31,6 +32,9 @@ export const browserRouter = () =>
         articleRoute,
         editorRoute,
         adminRoute,
+        membershipRoute,
+        membershipSuccessRoute,
+        membershipCancelledRoute,
       ],
       hydrateFallbackElement: <Spinner />,
     },

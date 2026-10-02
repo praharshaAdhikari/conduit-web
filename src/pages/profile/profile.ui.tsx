@@ -55,6 +55,13 @@ function ProfileInfo({ profile }: ProfileInfoProps) {
     <>
       <img src={profile.image} className="user-img" alt={profile.username} />
       <h4 data-test="app-header-username">{profile.username}</h4>
+      {profile.member && (
+        <p>
+          <span className="badge badge-member" data-test="profile-member-badge">
+            Member
+          </span>
+        </p>
+      )}
       <p data-test="app-header-bio">{profile.bio}</p>
 
       {!isOwnProfile && <ProfileFollowButton profile={profile} />}
@@ -187,7 +194,7 @@ type ProfileArticlePreviewCardProps = {
 };
 
 function ProfileArticlePreviewCard({ article }: ProfileArticlePreviewCardProps) {
-  const { author, updatedAt, slug, title, description, tagList } = article;
+  const { author, updatedAt, slug, title, description, tagList, membersOnly } = article;
   const { username: authorUsername, image } = author;
 
   return (
@@ -210,6 +217,7 @@ function ProfileArticlePreviewCard({ article }: ProfileArticlePreviewCardProps) 
 
       <Link className="preview-link" to={`/article/${slug}`}>
         <h1>{title}</h1>
+        {membersOnly && <span className="badge badge-member">Members only</span>}
         <p>{description}</p>
         <span>Read more...</span>
         <ul className="tag-list">
